@@ -11,3 +11,4 @@ wheels/
 
 # Coverage files
 .coverage
+coverage.xml

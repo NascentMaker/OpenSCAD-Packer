@@ -1,5 +1,8 @@
 # OpenSCAD Packer
 
+![PyPI - Version](https://img.shields.io/pypi/v/openscad-packer)
+![Codecov](https://img.shields.io/codecov/c/github/NascentMaker/OpenSCAD-Packer)
+
 Pack an OpenSCAD entry file and all its `use`/`include` dependencies into a single self-contained `.scad` file.
 
 Instead of distributing a project as a directory tree of files (and requiring recipients to have the same libraries installed), OpenSCAD Packer bundles everything into one file. It uses **tree-shaking** to include only the functions and modules that are actually called — directly or transitively — so the output stays lean even when pulling from large libraries.
