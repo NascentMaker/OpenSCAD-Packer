@@ -1,7 +1,7 @@
 # OpenSCAD Packer
 
 ![PyPI - Version](https://img.shields.io/pypi/v/openscad-packer)
-![Codecov](https://img.shields.io/codecov/c/github/NascentMaker/OpenSCAD-Packer)
+[![codecov](https://codecov.io/gh/NascentMaker/OpenSCAD-Packer/graph/badge.svg?token=S9WZESIJEF)](https://codecov.io/gh/NascentMaker/OpenSCAD-Packer)
 
 Pack an OpenSCAD entry file and all its `use`/`include` dependencies into a single self-contained `.scad` file.
 
