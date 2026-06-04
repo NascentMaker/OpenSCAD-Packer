@@ -25,6 +25,9 @@ dependencies = [
     "click>=8.0",
 ]
 
+[project.urls]
+Repository = "https://github.com/NascentMaker/OpenSCAD-Packer"
+
 [project.scripts]
 openscad-packer = "openscad_packer.cli:cli"
 

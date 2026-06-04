@@ -47,22 +47,8 @@ jobs:
           name: dist
           path: dist/
 
-  create-release:
-    needs: [build]
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create GitHub Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          tag: ${{ github.ref_name }}
-        run: |
-          gh release create "$tag" \
-              --repo="$GITHUB_REPOSITORY" \
-              --title="${GITHUB_REPOSITORY#*/} ${tag#v}" \
-              --generate-notes
-
   publish-to-pypi:
-    needs: [create-release]
+    needs: [build]
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
