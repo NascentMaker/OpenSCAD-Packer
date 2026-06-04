@@ -1,11 +1,12 @@
 [project]
 name = "openscad-packer"
-version = "2026.6.2"
+dynamic = ["version"]
 description = "Pack OpenSCAD includes into an efficient single file."
 readme = "README.md"
 license = "AGPL-3.0-or-later"
 requires-python = ">=3.11"
-authors = [{name = "Torgny Bjers"}]
+authors = [{name = "Torgny Bjers", email = "torgny.bjers@gmail.com"}]
+license-files = ["LICENSE"]
 keywords = [
     "openscad",
     "packer",
@@ -16,6 +17,7 @@ classifiers = [
     "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
 
     "Intended Audience :: Developers",
+    "Development Status :: 5 - Production/Stable",
 
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
@@ -50,5 +52,8 @@ exclude_lines = [
 ]
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
