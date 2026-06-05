@@ -56,7 +56,7 @@ def _walk_node(node: object, found: set[str]) -> None:
 
 def compute_reachable(
     seed_names: set[str],
-    pool: dict[str, FunctionDeclaration | ModuleDeclaration],
+    pool: dict[str, list[FunctionDeclaration | ModuleDeclaration]],
 ) -> set[str]:
     """Fixed-point reachability from seed_names through the definition pool.
 
@@ -69,7 +69,7 @@ def compute_reachable(
         reachable |= frontier
         next_frontier: set[str] = set()
         for name in frontier:
-            called = collect_called_names([pool[name]])
+            called = collect_called_names(pool[name])
             for callee in called:
                 if callee in pool and callee not in reachable:
                     next_frontier.add(callee)
