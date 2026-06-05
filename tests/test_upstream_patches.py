@@ -14,7 +14,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import openscad_packer  # ensure patches are applied
 from openscad_parser.ast import getASTfromFile
 from openscad_parser.ast.pretty_print import to_openscad
 
