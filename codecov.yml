@@ -1,0 +1,10 @@
+coverage:
+  status:
+    project:
+      default:
+        target: 90%
+        threshold: 2
+        base: "auto"
+        if_ci_failed: error
+        informational: false
+        only_pulls: false
