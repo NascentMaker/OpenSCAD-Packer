@@ -1,6 +1,8 @@
 """Integration tests for openscad_packer.packer."""
 from pathlib import Path
 
+import sys
+
 import pytest
 
 from openscad_packer.packer import Packer, PackerError, _strip_expression_comments
@@ -451,9 +453,8 @@ class TestCommentPreservation:
         assert "warning" not in captured.err.lower()
 
     def test_fallback_warning_when_string_parse_fails(self, tmp_path, capsys, monkeypatch):
-        import openscad_packer.packer as packer_mod
         entry = write(tmp_path, "entry.scad", "// A comment\ncube(10);")
-        monkeypatch.setattr(packer_mod, "getASTfromString", lambda *a, **kw: None)
+        monkeypatch.setattr(sys.modules[Packer.__module__], "getASTfromString", lambda *a, **kw: None)
         result = Packer(str(entry), []).pack()
         assert "cube" in result
         captured = capsys.readouterr()
@@ -462,9 +463,8 @@ class TestCommentPreservation:
     def test_fallback_no_warning_for_empty_file(self, tmp_path, capsys, monkeypatch):
         # When getASTfromString fails AND the file is empty, the fallback also returns
         # nothing — `if nodes:` is False so no warning is printed (branch 239->245).
-        import openscad_packer.packer as packer_mod
         entry = write(tmp_path, "entry.scad", "")
-        monkeypatch.setattr(packer_mod, "getASTfromString", lambda *a, **kw: None)
+        monkeypatch.setattr(sys.modules[Packer.__module__], "getASTfromString", lambda *a, **kw: None)
         result = Packer(str(entry), []).pack()
         assert result.strip() == ""
         captured = capsys.readouterr()
