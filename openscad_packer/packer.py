@@ -42,9 +42,11 @@ class Packer:
         self.entry_file = os.path.abspath(entry_file)
         self.library_paths = [os.path.abspath(p) for p in library_paths]
 
-        # Definition pool: name → node, insertion-ordered via _pool_order.
-        # Last-writer-wins for the value; first-encounter order preserved.
-        self._pool: dict[str, FunctionDeclaration | ModuleDeclaration] = {}
+        # Definition pool: name → list of nodes, insertion-ordered via _pool_order.
+        # A name may have both a FunctionDeclaration and a ModuleDeclaration (OpenSCAD
+        # dual-namespace pattern used by BOSL). Last-writer-wins per type; first-encounter
+        # order preserved across names.
+        self._pool: dict[str, list[FunctionDeclaration | ModuleDeclaration]] = {}
         self._pool_order: list[str] = []
 
         # Non-definition top-level nodes (assignments, module calls, etc.)
@@ -60,7 +62,12 @@ class Packer:
 
         seed = collect_called_names(self._body_nodes)
         reachable = compute_reachable(seed, self._pool)
-        used_defs = [self._pool[n] for n in self._pool_order if n in reachable]
+        used_defs = [
+            defn
+            for n in self._pool_order
+            if n in reachable
+            for defn in self._pool[n]
+        ]
 
         return to_openscad(used_defs + self._body_nodes)
 
@@ -116,4 +123,9 @@ class Packer:
         name = node.name.name
         if name not in self._pool:
             self._pool_order.append(name)
-        self._pool[name] = node
+            self._pool[name] = []
+        for i, existing in enumerate(self._pool[name]):
+            if type(existing) is type(node):
+                self._pool[name][i] = node
+                return
+        self._pool[name].append(node)

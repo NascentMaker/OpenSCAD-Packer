@@ -312,3 +312,63 @@ class TestSmoke:
         assert "is_even" in result
         assert "is_odd" in result
         assert "unrelated" not in result
+
+
+# ---------------------------------------------------------------------------
+# Dual-namespace: same name defined as both function and module (BOSL pattern)
+# ---------------------------------------------------------------------------
+
+class TestDualNamespace:
+    def test_both_defs_emitted_when_called_as_module(self, tmp_path):
+        write(tmp_path, "lib.scad",
+              "module foo(x) { cube(x); } "
+              "function foo(x) = x + 1;")
+        entry = write(tmp_path, "entry.scad", "use <lib.scad>\nfoo(5);")
+        result = pack(entry)
+        assert "module foo" in result
+        assert "function foo" in result
+
+    def test_both_defs_emitted_when_called_as_function(self, tmp_path):
+        write(tmp_path, "lib.scad",
+              "module foo(x) { cube(x); } "
+              "function foo(x) = x + 1;")
+        entry = write(tmp_path, "entry.scad", "use <lib.scad>\ny = foo(3);")
+        result = pack(entry)
+        assert "module foo" in result
+        assert "function foo" in result
+
+    def test_neither_def_emitted_when_not_called(self, tmp_path):
+        write(tmp_path, "lib.scad",
+              "module foo(x) { cube(x); } "
+              "function foo(x) = x + 1;")
+        entry = write(tmp_path, "entry.scad", "use <lib.scad>\ncube(10);")
+        result = pack(entry)
+        assert "foo" not in result
+
+    def test_bosl_assertion_pattern(self, tmp_path):
+        write(tmp_path, "compat.scad",
+              "module assertion(succ, msg) { if (!succ) echo(str(\"ASSERT: \", msg)); }\n"
+              "function assertion(succ, msg) = succ ? true : undef;")
+        entry = write(tmp_path, "entry.scad",
+                      "use <compat.scad>\nassertion(true, \"ok\");")
+        result = pack(entry)
+        assert "module assertion" in result
+        assert "function assertion" in result
+
+    def test_same_type_last_writer_wins(self, tmp_path):
+        write(tmp_path, "lib.scad",
+              "function foo(x) = x + 1;\n"
+              "function foo(x) = x * 99;")
+        entry = write(tmp_path, "entry.scad", "use <lib.scad>\ny = foo(1);")
+        result = pack(entry)
+        assert "x * 99" in result
+        assert "x + 1" not in result
+
+    def test_order_preserved_module_before_function(self, tmp_path):
+        write(tmp_path, "lib.scad",
+              "module assertion(succ, msg) { if (!succ) echo(msg); }\n"
+              "function assertion(succ, msg) = succ ? true : undef;")
+        entry = write(tmp_path, "entry.scad",
+                      "use <lib.scad>\nassertion(true, \"ok\");")
+        result = pack(entry)
+        assert result.index("module assertion") < result.index("function assertion")

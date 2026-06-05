@@ -15,12 +15,20 @@ def parse(tmp_path: Path, content: str) -> list:
 
 
 def make_pool(tmp_path: Path, content: str) -> dict:
-    """Parse content and return a pool dict of all function/module declarations."""
+    """Parse content and return a list-valued pool dict (mirrors _add_to_pool logic)."""
     nodes = parse(tmp_path, content)
-    pool = {}
+    pool: dict[str, list] = {}
     for node in nodes:
         if isinstance(node, (FunctionDeclaration, ModuleDeclaration)):
-            pool[node.name.name] = node
+            name = node.name.name
+            if name not in pool:
+                pool[name] = []
+            for i, existing in enumerate(pool[name]):
+                if type(existing) is type(node):
+                    pool[name][i] = node
+                    break
+            else:
+                pool[name].append(node)
     return pool
 
 
@@ -160,3 +168,20 @@ class TestComputeReachable:
         )
         reachable = compute_reachable({"a"}, pool)
         assert reachable == {"a", "b", "c", "d"}
+
+    def test_dual_namespace_traverses_all_defs(self, tmp_path):
+        """When pool["foo"] holds both a module and a function, reachability must
+        traverse both — names called by either definition become reachable."""
+        pool = make_pool(
+            tmp_path,
+            "module foo(x) { bar(x); } "
+            "function foo(x) = baz(x); "
+            "module bar(x) { cube(x); } "
+            "function baz(x) = x * 2; "
+            "function unused(x) = 0;"
+        )
+        reachable = compute_reachable({"foo"}, pool)
+        assert "foo" in reachable
+        assert "bar" in reachable      # called by module foo
+        assert "baz" in reachable      # called by function foo
+        assert "unused" not in reachable
