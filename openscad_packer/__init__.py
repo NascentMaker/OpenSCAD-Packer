@@ -13,3 +13,5 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://gnu.org>.
 
+from . import patches as _patches  # noqa: F401  apply upstream workarounds
+
