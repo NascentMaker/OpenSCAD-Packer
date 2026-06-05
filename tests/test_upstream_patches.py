@@ -14,8 +14,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import pytest
-
 import openscad_packer  # ensure patches are applied
 from openscad_parser.ast import getASTfromFile
 from openscad_parser.ast.pretty_print import to_openscad
@@ -90,7 +88,7 @@ class TestEmptyStringLiteral:
         assert '"hello"' in out
 
     def test_empty_string_round_trip_via_packer(self, tmp_path):
-        lib = write(tmp_path, "lib.scad", 'function isempty(v) = v == "";')
+        write(tmp_path, "lib.scad", 'function isempty(v) = v == "";')
         entry = write(tmp_path, "entry.scad", 'use <lib.scad>\ny = isempty("test");')
         result = pack(entry)
         assert '"" | ""' not in result
@@ -154,8 +152,8 @@ class TestRangeLiteral:
         assert "[0:3:1]" not in out
 
     def test_two_arg_range_round_trip_via_packer(self, tmp_path):
-        lib = write(tmp_path, "lib.scad",
-                    "function vsum(v) = [for (i=[0:len(v)-1]) v[i]];")
+        write(tmp_path, "lib.scad",
+              "function vsum(v) = [for (i=[0:len(v)-1]) v[i]];")
         entry = write(tmp_path, "entry.scad",
                       "use <lib.scad>\nx = vsum([1,2,3]);")
         result = pack(entry)
@@ -219,7 +217,7 @@ class TestBOSLPatterns:
 
     def test_bosl_compat_mini_via_packer(self, tmp_path):
         """Packs a mini BOSL compat subset and verifies no corruption."""
-        compat = write(tmp_path, "compat.scad", """\
+        write(tmp_path, "compat.scad", """\
 function is_def(v) = v != undef;
 function is_str(v) = v=="" || (is_def(v) && is_def(v[0]));
 function vmul(v1, v2) = [for (i=[0:len(v1)-1]) v1[i]*v2[i]];
