@@ -7,6 +7,16 @@ Pack an OpenSCAD entry file and all its `use`/`include` dependencies into a sing
 
 Instead of distributing a project as a directory tree of files (and requiring recipients to have the same libraries installed), OpenSCAD Packer bundles everything into one file. It uses **tree-shaking** to include only the functions and modules that are actually called — directly or transitively — so the output stays lean even when pulling from large libraries.
 
+## Why?
+
+3D printing model sites such as [Printables](https://www.printables.com), [Thingiverse](https://www.thingiverse.com), and [MakerWorld](https://makerworld.com) support **parametric models**: the site parses an uploaded `.scad` file, exposes its configurable parameters to the user (via OpenSCAD's [Customizer](https://en.wikibooks.org/wiki/OpenSCAD_User_Manual/Customizer)), and renders a download-ready 3MF or STL with the chosen values — no local OpenSCAD installation required.
+
+The catch: **these sites only accept a single `.scad` file**. A design that pulls in [BOSL2](https://github.com/BelfrySCAD/BOSL2), [NopSCADlib](https://github.com/nophead/NopSCADlib), or any other library cannot be uploaded as-is. The creator must somehow inline all dependencies into one file before uploading.
+
+OpenSCAD Packer automates that. It resolves every `use` and `include`, tree-shakes out the unused code, and writes a single self-contained file ready to upload.
+
+OpenSCAD's Customizer reads **magic comments** in the `.scad` source to build its parameter UI — for example, `width = 20; // [1:100]` creates a slider, and `/* [Section Name] */` creates a collapsible group. By default, OpenSCAD Packer preserves comments from the entry file so these annotations survive packing and the Customizer UI works as expected on the destination site. Pass `--no-preserve-comments` to strip them if you prefer a leaner output.
+
 ## How it works
 
 - `use <lib.scad>` — the library is parsed and only the reachable function and module definitions are inlined. Variables and top-level calls are discarded (matching OpenSCAD's own `use` semantics).
@@ -38,8 +48,10 @@ Arguments:
   INPUT                   Entry .scad file to pack.
 
 Options:
-  -o, --output PATH       Output file. Defaults to stdout.
-  -L, --library-path PATH Extra library search directory (repeatable).
+  -o, --output PATH                Output file. Defaults to stdout.
+  -L, --library-path PATH          Extra library search directory (repeatable).
+  --preserve-comments/--no-preserve-comments
+                                   Preserve entry-file comments in output (default: on).
   --help
 ```
 

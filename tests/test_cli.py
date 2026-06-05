@@ -144,6 +144,30 @@ class TestPackErrors:
 
 
 # ---------------------------------------------------------------------------
+# pack — preserve-comments flag
+# ---------------------------------------------------------------------------
+
+class TestPreserveCommentsFlag:
+    def test_comments_preserved_by_default(self, runner, tmp_path):
+        entry = write(tmp_path, "entry.scad", "// My comment\ncube(10);")
+        result = runner.invoke(cli, ["pack", str(entry)])
+        assert result.exit_code == 0
+        assert "My comment" in result.output
+
+    def test_preserve_comments_flag_explicit(self, runner, tmp_path):
+        entry = write(tmp_path, "entry.scad", "// My comment\ncube(10);")
+        result = runner.invoke(cli, ["pack", str(entry), "--preserve-comments"])
+        assert result.exit_code == 0
+        assert "My comment" in result.output
+
+    def test_no_preserve_comments_strips_comments(self, runner, tmp_path):
+        entry = write(tmp_path, "entry.scad", "// My comment\ncube(10);")
+        result = runner.invoke(cli, ["pack", str(entry), "--no-preserve-comments"])
+        assert result.exit_code == 0
+        assert "My comment" not in result.output
+
+
+# ---------------------------------------------------------------------------
 # pack — help
 # ---------------------------------------------------------------------------
 
