@@ -28,7 +28,7 @@ def parse_and_print(path: Path, src: str) -> str:
     """Write *src* to *path*, parse it, and pretty-print back to string."""
     path.write_text(src, encoding="utf-8")
     nodes = getASTfromFile(str(path), process_includes=False) or []
-    return to_openscad(nodes)
+    return to_openscad(nodes) or ""
 
 
 def pack(entry: Path, library_paths: list[str] | None = None) -> str:
@@ -127,8 +127,9 @@ class TestRangeLiteral:
         assert "[0:1:2]" in out
 
     def test_three_arg_range_large_step_preserved(self, tmp_path):
-        # [0:5:1] means start=0, step=5, end=1 — semantically different from [0:1]
-        # ([0:5] is a two-arg range: start=0, end=5, implicit step=1.)
+        # [0:5:1] is a three-arg range [start:step:end] => start=0, step=5, end=1.
+        # This is semantically different from two-arg [0:1] ([start:end], implicit step=1).
+        # Likewise, [0:5] is also two-arg and must not replace [0:5:1].
         src = "x = [for (i=[0:5:1]) i];"
         out = parse_and_print(tmp_path / "t.scad", src)
         assert "[0:5:1]" in out
