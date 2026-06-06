@@ -1,7 +1,6 @@
 """Unit tests for openscad_packer.shaker."""
 from pathlib import Path
 
-import pytest
 from openscad_parser.ast import getASTfromFile
 from openscad_parser.ast.nodes import FunctionDeclaration, ModuleDeclaration
 
@@ -24,7 +23,7 @@ def make_pool(tmp_path: Path, content: str) -> dict:
             if name not in pool:
                 pool[name] = []
             for i, existing in enumerate(pool[name]):
-                if type(existing) is type(node):
+                if isinstance(existing, type(node)):
                     pool[name][i] = node
                     break
             else:

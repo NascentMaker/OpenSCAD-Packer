@@ -1,8 +1,6 @@
 """Unit tests for openscad_packer.resolver."""
 from pathlib import Path
 
-import pytest
-
 from openscad_packer.resolver import resolve_library
 
 

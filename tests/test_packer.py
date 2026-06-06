@@ -208,8 +208,8 @@ class TestTreeShaking:
               "module scaled_box(s) { cube(scale_val(s)); }")
         entry = write(tmp_path, "entry.scad",
                       "use <shapes.scad>\nscaled_box(5);")
-        # Note: use <math.scad> inside shapes.scad is processed with process_includes=True,
-        # so scale_val ends up in the pool via shapes.scad's flattened parse
+        # shapes.scad itself references math.scad, and packing resolves that dependency
+        # when processing the library, so scaled_box can be emitted correctly.
         result = pack(entry)
         assert "scaled_box" in result
 
@@ -373,7 +373,7 @@ class TestStripExpressionComments:
 
     def test_unterminated_string_at_eof_handled(self):
         # A string literal that reaches EOF without a closing `"` must not crash —
-        # exercises the `while i < len(code)` exit-without-break branch (58->68).
+        # exercises the string-scanning loop path where EOF is reached before a closing quote.
         result = _strip_expression_comments('"unclosed')
         assert '"unclosed' in result
 
@@ -459,8 +459,8 @@ class TestCommentPreservation:
         assert "warning" in captured.err.lower()
 
     def test_fallback_no_warning_for_empty_file(self, tmp_path, capsys, monkeypatch):
-        # When getASTfromString fails AND the file is empty, the fallback also returns
-        # nothing — `if nodes:` is False so no warning is printed (branch 239->245).
+        # When getASTfromString fails and the file is empty, the fallback returns
+        # no nodes, so `if nodes:` is False and no warning is printed.
         entry = write(tmp_path, "entry.scad", "")
         monkeypatch.setattr("openscad_packer.packer.getASTfromString", lambda *a, **kw: None)
         result = Packer(str(entry), []).pack()
