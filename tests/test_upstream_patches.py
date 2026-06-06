@@ -28,7 +28,7 @@ def parse_and_print(path: Path, src: str) -> str:
     """Write *src* to *path*, parse it, and pretty-print back to string."""
     path.write_text(src, encoding="utf-8")
     nodes = getASTfromFile(str(path), process_includes=False) or []
-    return to_openscad(nodes)
+    return to_openscad(nodes) or ""
 
 
 def pack(entry: Path, library_paths: list[str] | None = None) -> str:
