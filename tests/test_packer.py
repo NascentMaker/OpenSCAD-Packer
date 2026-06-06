@@ -454,7 +454,7 @@ class TestCommentPreservation:
 
     def test_fallback_warning_when_string_parse_fails(self, tmp_path, capsys, monkeypatch):
         entry = write(tmp_path, "entry.scad", "// A comment\ncube(10);")
-        monkeypatch.setattr(sys.modules[Packer.__module__], "getASTfromString", lambda *a, **kw: None)
+        monkeypatch.setattr("openscad_packer.packer.getASTfromString", lambda *a, **kw: None)
         result = Packer(str(entry), []).pack()
         assert "cube" in result
         captured = capsys.readouterr()
@@ -464,7 +464,7 @@ class TestCommentPreservation:
         # When getASTfromString fails AND the file is empty, the fallback also returns
         # nothing — `if nodes:` is False so no warning is printed (branch 239->245).
         entry = write(tmp_path, "entry.scad", "")
-        monkeypatch.setattr(sys.modules[Packer.__module__], "getASTfromString", lambda *a, **kw: None)
+        monkeypatch.setattr("openscad_packer.packer.getASTfromString", lambda *a, **kw: None)
         result = Packer(str(entry), []).pack()
         assert result.strip() == ""
         captured = capsys.readouterr()
