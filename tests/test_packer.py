@@ -1,8 +1,6 @@
 """Integration tests for openscad_packer.packer."""
 from pathlib import Path
 
-import sys
-
 import pytest
 
 from openscad_packer.packer import Packer, PackerError, _strip_expression_comments
