@@ -14,22 +14,31 @@ def parse(tmp_path: Path, content: str) -> list[Any]:
     return getASTfromFile(str(test_file), process_includes=False) or []
 
 
-def make_pool(tmp_path: Path, content: str) -> dict[str, list]:
+def make_pool(
+    tmp_path: Path, content: str
+) -> dict[str, list[FunctionDeclaration | ModuleDeclaration]]:
     """Parse content and return a list-valued pool dict.
 
     This mirrors the private ``_add_to_pool`` behavior in ``openscad_packer.packer``.
     """
     nodes = parse(tmp_path, content)
-    pool: dict[str, list] = {}
+    pool: dict[str, list[FunctionDeclaration | ModuleDeclaration]] = {}
     for node in nodes:
         if isinstance(node, (FunctionDeclaration, ModuleDeclaration)):
             name = node.name.name
             if name not in pool:
                 pool[name] = []
+            # Keep at most one declaration per (name, declaration type).
+            # If another declaration of the same type appears later, it replaces
+            # the earlier one (latest-wins), while a different type is kept too
+            # (for example, both a function and a module named "foo").
+            replace_at: int | None = None
             for i, existing in enumerate(pool[name]):
                 if isinstance(existing, type(node)):
-                    pool[name][i] = node
+                    replace_at = i
                     break
+            if replace_at is not None:
+                pool[name][replace_at] = node
             else:
                 pool[name].append(node)
     return pool
