@@ -14,13 +14,15 @@ def parse(tmp_path: Path, content: str) -> list[Any]:
     return getASTfromFile(str(test_file), process_includes=False) or []
 
 
-def make_pool(tmp_path: Path, content: str) -> dict[str, list]:
+def make_pool(
+    tmp_path: Path, content: str
+) -> dict[str, list[FunctionDeclaration | ModuleDeclaration]]:
     """Parse content and return a list-valued pool dict.
 
     This mirrors the private ``_add_to_pool`` behavior in ``openscad_packer.packer``.
     """
     nodes = parse(tmp_path, content)
-    pool: dict[str, list] = {}
+    pool: dict[str, list[FunctionDeclaration | ModuleDeclaration]] = {}
     for node in nodes:
         if isinstance(node, (FunctionDeclaration, ModuleDeclaration)):
             name = node.name.name
