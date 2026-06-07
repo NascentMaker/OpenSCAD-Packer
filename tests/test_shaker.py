@@ -98,8 +98,9 @@ class TestCollectCalledNames:
     def test_does_not_collect_non_identifier_primary_calls(self, tmp_path):
         # (function(x) x*2)(5) — PrimaryCall where left is a FunctionLiteral, not Identifier
         names = collect_called_names(parse(tmp_path, "y = (function(x) x*2)(5);"))
-        # No Identifier on the left side, so nothing collected from the call itself
+        # No Identifier on the left side, so nothing should be collected
         assert "function" not in names
+        assert names == set()
 
 
 class TestComputeReachable:
