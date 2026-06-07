@@ -9,9 +9,9 @@ from openscad_packer.shaker import collect_called_names, compute_reachable
 
 
 def parse(tmp_path: Path, content: str) -> list[Any]:
-    f = tmp_path / "test.scad"
-    f.write_text(content)
-    return getASTfromFile(str(f), process_includes=False) or []
+    test_file = tmp_path / "test.scad"
+    test_file.write_text(content)
+    return getASTfromFile(str(test_file), process_includes=False) or []
 
 
 def make_pool(tmp_path: Path, content: str) -> dict[str, list]:
