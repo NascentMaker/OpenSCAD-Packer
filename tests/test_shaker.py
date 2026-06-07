@@ -1,13 +1,14 @@
 """Unit tests for openscad_packer.shaker."""
 from pathlib import Path
 from typing import Any
+from typing import Any
 
 from openscad_parser.ast import getASTfromFile
 from openscad_parser.ast.nodes import FunctionDeclaration, ModuleDeclaration
 
 from openscad_packer.shaker import collect_called_names, compute_reachable
 
-
+def parse(tmp_path: Path, content: str) -> list[Any]:
 def parse(tmp_path: Path, content: str) -> list[Any]:
     test_file = tmp_path / "test.scad"
     test_file.write_text(content)
