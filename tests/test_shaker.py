@@ -17,7 +17,7 @@ def parse(tmp_path: Path, content: str) -> list[Any]:
 def make_pool(tmp_path: Path, content: str) -> dict[str, list]:
     """Parse content and return a list-valued pool dict.
 
-    This mirrors the private ``_add_to_pool`` behavior in ``openscad_packer.shaker``.
+    This mirrors the private ``_add_to_pool`` behavior in ``openscad_packer.packer``.
     """
     nodes = parse(tmp_path, content)
     pool: dict[str, list] = {}
@@ -98,8 +98,9 @@ class TestCollectCalledNames:
     def test_does_not_collect_non_identifier_primary_calls(self, tmp_path):
         # (function(x) x*2)(5) — PrimaryCall where left is a FunctionLiteral, not Identifier
         names = collect_called_names(parse(tmp_path, "y = (function(x) x*2)(5);"))
-        # No Identifier on the left side, so nothing should be collected
-        assert "function" not in names
+        # The callee is a FunctionLiteral (not an Identifier), so the call site
+        # contributes nothing. The body x*2 has no inner calls either, so the
+        # full result must be empty.
         assert names == set()
 
 
