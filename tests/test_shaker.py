@@ -67,6 +67,7 @@ class TestCollectCalledNames:
 
     def test_collects_function_call_inside_module(self, tmp_path):
         names = collect_called_names(parse(tmp_path, "module foo(s) { cube(scale(s)); }"))
+        assert "cube" in names
         assert "scale" in names
         assert "cube" in names
 
