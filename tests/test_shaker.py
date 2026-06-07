@@ -1,14 +1,13 @@
 """Unit tests for openscad_packer.shaker."""
 from pathlib import Path
 from typing import Any
-from typing import Any
 
 from openscad_parser.ast import getASTfromFile
 from openscad_parser.ast.nodes import FunctionDeclaration, ModuleDeclaration
 
 from openscad_packer.shaker import collect_called_names, compute_reachable
 
-def parse(tmp_path: Path, content: str) -> list[Any]:
+
 def parse(tmp_path: Path, content: str) -> list[Any]:
     f = tmp_path / "test.scad"
     f.write_text(content)
@@ -68,7 +67,6 @@ class TestCollectCalledNames:
 
     def test_collects_function_call_inside_module(self, tmp_path):
         names = collect_called_names(parse(tmp_path, "module foo(s) { cube(scale(s)); }"))
-        assert "cube" in names
         assert "scale" in names
         assert "cube" in names
 
