@@ -15,7 +15,10 @@ def parse(tmp_path: Path, content: str) -> list[Any]:
 
 
 def make_pool(tmp_path: Path, content: str) -> dict[str, list]:
-    """Parse content and return a list-valued pool dict (mirrors _add_to_pool logic)."""
+    """Parse content and return a list-valued pool dict.
+
+    This mirrors the private ``_add_to_pool`` behavior in ``openscad_packer.shaker``.
+    """
     nodes = parse(tmp_path, content)
     pool: dict[str, list] = {}
     for node in nodes:
